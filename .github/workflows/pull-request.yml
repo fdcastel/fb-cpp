@@ -96,7 +96,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cp CMakeUserPresets.json.embedded-linux.template CMakeUserPresets.json
+          cp CMakeUserPresets.json.embedded-posix.template CMakeUserPresets.json
           cmake --preset default
 
       - name: Upload vcpkg failure logs
@@ -236,18 +236,23 @@ jobs:
               libtool \
               mono
 
-      - name: Install Firebird
-        run: |
-          wget -nv -O Firebird-5.0.3.1683-0-macos-arm64.pkg \
-              "https://github.com/FirebirdSQL/firebird/releases/download/v5.0.3/Firebird-5.0.3.1683-0-macos-arm64.pkg"
-          sudo installer -verbose -pkg Firebird-5.0.3.1683-0-macos-arm64.pkg -target /
+      - name: Cache Firebird environment
+        id: cache-firebird
+        uses: actions/cache@v4
+        with:
+          path: /tmp/firebird
+          key: firebird-embedded-macos-arm64-5.0.3
 
-      - name: Configure Firebird
+      - name: Download Firebird (embedded)
+        if: steps.cache-firebird.outputs.cache-hit != 'true'
         run: |
-          sudo launchctl unload /Library/LaunchDaemons/org.firebird.gds.plist
-          echo "alter user SYSDBA password 'masterkey';" | \
-              sudo /Library/Frameworks/Firebird.framework/Versions/A/Resources/bin/isql employee -user SYSDBA -q
-          sudo launchctl load /Library/LaunchDaemons/org.firebird.gds.plist
+          wget -nv -O /tmp/Firebird.pkg \
+              "https://github.com/FirebirdSQL/firebird/releases/download/v5.0.3/Firebird-5.0.3.1683-0-macos-arm64.pkg"
+          pkgutil --expand /tmp/Firebird.pkg /tmp/firebird-pkg
+          mkdir -p /tmp/firebird-extract
+          tar xzf /tmp/firebird-pkg/firebirdbuild.pkg/Payload -C /tmp/firebird-extract
+          mv /tmp/firebird-extract/Library/Frameworks/Firebird.framework/Versions/A /tmp/firebird
+          rm -rf /tmp/firebird-pkg /tmp/firebird-extract /tmp/Firebird.pkg
 
       - name: Bootstrap vcpkg
         run: |
@@ -269,7 +274,7 @@ jobs:
 
       - name: Configure CMake
         run: |
-          cp CMakeUserPresets.json.posix.template CMakeUserPresets.json
+          cp CMakeUserPresets.json.embedded-posix.template CMakeUserPresets.json
           cmake --preset default
 
       - name: Upload vcpkg failure logs
@@ -285,5 +290,8 @@ jobs:
           cmake --build --preset default
 
       - name: Run tests
+        env:
+          FIREBIRD: /tmp/firebird/Resources
+          DYLD_LIBRARY_PATH: /tmp/firebird/Libraries
         run: |
           ctest --preset default --verbose
