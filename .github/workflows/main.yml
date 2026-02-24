@@ -295,16 +295,9 @@ jobs:
               "https://github.com/FirebirdSQL/firebird/releases/download/v5.0.3/Firebird-5.0.3.1683-0-macos-arm64.pkg"
           pkgutil --expand /tmp/Firebird.pkg /tmp/firebird-pkg
           mkdir -p /tmp/firebird-extract
-          # Find and extract the Payload from the expanded package
           PAYLOAD=$(find /tmp/firebird-pkg -name 'Payload' -type f | head -1)
-          echo "Found payload: $PAYLOAD"
           tar xzf "$PAYLOAD" -C /tmp/firebird-extract
-          # Debug: show extracted structure
-          find /tmp/firebird-extract -maxdepth 5 -type d
-          # Move the framework version directory
-          FBDIR=$(find /tmp/firebird-extract -path '*/Firebird.framework/Versions/A' -type d | head -1)
-          echo "Found framework: $FBDIR"
-          mv "$FBDIR" /tmp/firebird
+          mv /tmp/firebird-extract/Versions/A /tmp/firebird
           rm -rf /tmp/firebird-pkg /tmp/firebird-extract /tmp/Firebird.pkg
 
       - name: Bootstrap vcpkg
