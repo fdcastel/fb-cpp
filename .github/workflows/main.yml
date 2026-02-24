@@ -339,10 +339,13 @@ jobs:
         run: |
           # Replace vcpkg's client-only libfbclient with the full distribution
           # version that includes the embedded engine provider.
-          find build -name 'libfbclient.dylib*' -exec rm -f {} \;
-          find build -name 'libfbclient.dylib*' -type l -exec rm -f {} \;
           VCPKG_LIB=$(find build/vcpkg_installed -path '*/debug/lib' -type d | head -1)
-          cp /tmp/firebird/Libraries/libfbclient.dylib "$VCPKG_LIB/"
+          # Remove vcpkg's client-only copies
+          find "$VCPKG_LIB" -name 'libfbclient.dylib*' -exec rm -f {} \;
+          # Copy full distribution library and create versioned symlinks
+          cp /tmp/firebird/Libraries/libfbclient.dylib "$VCPKG_LIB/libfbclient.dylib.5.0.3"
+          ln -sf libfbclient.dylib.5.0.3 "$VCPKG_LIB/libfbclient.dylib.2"
+          ln -sf libfbclient.dylib.5.0.3 "$VCPKG_LIB/libfbclient.dylib"
 
       - name: Run tests
         env:
