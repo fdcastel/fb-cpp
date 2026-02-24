@@ -335,6 +335,15 @@ jobs:
         run: |
           cmake --build --preset default
 
+      - name: Prepare Firebird embedded for tests
+        run: |
+          # Replace vcpkg's client-only libfbclient with the full distribution
+          # version that includes the embedded engine provider.
+          find build -name 'libfbclient.dylib*' -exec rm -f {} \;
+          find build -name 'libfbclient.dylib*' -type l -exec rm -f {} \;
+          VCPKG_LIB=$(find build/vcpkg_installed -path '*/debug/lib' -type d | head -1)
+          cp /tmp/firebird/Libraries/libfbclient.dylib "$VCPKG_LIB/"
+
       - name: Run tests
         env:
           FIREBIRD: /tmp/firebird/Resources
