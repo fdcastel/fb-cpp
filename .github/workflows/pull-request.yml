@@ -301,10 +301,12 @@ jobs:
           cp /tmp/firebird/Libraries/libfbclient.dylib "$VCPKG_LIB/libfbclient.dylib.5.0.3"
           ln -sf libfbclient.dylib.5.0.3 "$VCPKG_LIB/libfbclient.dylib.2"
           ln -sf libfbclient.dylib.5.0.3 "$VCPKG_LIB/libfbclient.dylib"
+          # Add RPATH so the library can find its dependencies (libtommath, etc.)
+          install_name_tool -add_rpath /tmp/firebird/Resources "$VCPKG_LIB/libfbclient.dylib.5.0.3"
 
       - name: Run tests
         env:
           FIREBIRD: /tmp/firebird/Resources
-          DYLD_LIBRARY_PATH: /tmp/firebird/Libraries
+          DYLD_LIBRARY_PATH: /tmp/firebird/Libraries:/tmp/firebird/Resources/lib
         run: |
           ctest --preset default --verbose
