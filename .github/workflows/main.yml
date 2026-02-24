@@ -299,7 +299,12 @@ jobs:
           PAYLOAD=$(find /tmp/firebird-pkg -name 'Payload' -type f | head -1)
           echo "Found payload: $PAYLOAD"
           tar xzf "$PAYLOAD" -C /tmp/firebird-extract
-          mv /tmp/firebird-extract/Library/Frameworks/Firebird.framework/Versions/A /tmp/firebird
+          # Debug: show extracted structure
+          find /tmp/firebird-extract -maxdepth 5 -type d
+          # Move the framework version directory
+          FBDIR=$(find /tmp/firebird-extract -path '*/Firebird.framework/Versions/A' -type d | head -1)
+          echo "Found framework: $FBDIR"
+          mv "$FBDIR" /tmp/firebird
           rm -rf /tmp/firebird-pkg /tmp/firebird-extract /tmp/Firebird.pkg
 
       - name: Bootstrap vcpkg
