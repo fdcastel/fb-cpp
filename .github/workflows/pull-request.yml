@@ -50,9 +50,9 @@ jobs:
             vcpkg/buildtrees
             vcpkg/packages
             build/Debug/vcpkg_installed
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          key: ${{ runner.os }}-vcpkg-v2-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
           restore-keys: |
-            ${{ runner.os }}-vcpkg-
+            ${{ runner.os }}-vcpkg-v2-
 
       - name: Install system dependencies
         run: |
@@ -156,9 +156,9 @@ jobs:
             vcpkg/buildtrees
             vcpkg/packages
             build/vcpkg_installed
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          key: ${{ runner.os }}-vcpkg-v2-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
           restore-keys: |
-            ${{ runner.os }}-vcpkg-
+            ${{ runner.os }}-vcpkg-v2-
 
       - name: Cache Firebird environment
         id: cache-firebird
@@ -259,9 +259,9 @@ jobs:
             vcpkg/buildtrees
             vcpkg/packages
             build/Debug/vcpkg_installed
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
+          key: ${{ runner.os }}-vcpkg-v2-${{ hashFiles('vcpkg.json', 'vcpkg-configuration.json') }}
           restore-keys: |
-            ${{ runner.os }}-vcpkg-
+            ${{ runner.os }}-vcpkg-v2-
 
       - name: Install system dependencies
         run: |
